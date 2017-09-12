@@ -64,6 +64,7 @@
 	 * @property {jQuery|string} activator - Object (or css selector) for object to activate editing. Defaults to the element itself.
 	 * @property {boolean} textOnly - When true (the default) text returned from server is displayed literally and not as html.
 	 * @property {string} placeholder - Text to display in empty elements.
+	 * @property {string} placeholderClass - Class to apply to element if placeholder is used.
 	 * @property {submitFunction} submitFunction - Function that is called to submit the new value.
 	 * @property {loadFunction} loadFunction - Function that is called to load the editing data
 	 */
@@ -82,6 +83,7 @@
 		'activator',
 		'textOnly',
 		'placeholder',
+		'placeholderClass',
 		'submitFunction',
 		'okButtonClass',
 		'cancelButtonClass'
@@ -162,6 +164,7 @@
 			// If there is no content, then we replace it with the empty indicator.
 			var $el = this.element;
 			if ($.trim($el.html()) == "") {
+				$el.addClass(opts.placeholderClass);
 				$el.html(opts.placeholder);
 
 				// In IE<9 the html is made uppercase which means it no longer matches what think the text is.
@@ -363,10 +366,14 @@
 		 */
 		setContent: function(data) {
 			var element = this.element;
+			var $el = $(element);
 
 			if (!data) {
+				$el.addClass(this.opts.placeholderClass);
 				element.html(this.opts.placeholder);
 				return;
+			} else {
+				$el.removeClass(this.opts.placeholderClass);
 			}
 
 			if (this.opts.textOnly) {
@@ -421,6 +428,7 @@
 		type: "input",
 		textOnly: true,
 		placeholder: '[ --- ]',
+		placeholderClass: 'jip-placeholder',
 
 		/**
 		 * @name Options.submitFunction
