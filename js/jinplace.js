@@ -59,6 +59,8 @@
 	 * @property {string} okButton - Create a submit button with this name
 	 * @property {string} cancelButton - Create a cancel button with this name
 	 * @property {string} inputClass - A css class that is added to the input field
+	 * @property {string} inputType - An input type for the input field
+	 * @property {boolean} inputPlaceholder - Show initial value as placeholder on input
 	 * @property {string} okButtonClass - A css class that is added to the ok button
 	 * @property {string} cancelButtonClass - A css class that is added to the cancel button
 	 * @property {jQuery|string} activator - Object (or css selector) for object to activate editing. Defaults to the element itself.
@@ -80,6 +82,8 @@
 		'okButton',
 		'cancelButton',
 		'inputClass',
+		'inputType',
+		'inputPlaceholder',
 		'activator',
 		'textOnly',
 		'placeholder',
@@ -211,6 +215,10 @@
 				if (!editor.inputField)
 					editor.inputField = field;
 				field.addClass(opts.inputClass);
+				if (opts.inputType)
+					field.attr('type', opts.inputType);
+				if (opts.inputPlaceholder)
+					field.attr('placeholder', data);
 
 				var form = createForm(opts, field, editor.buttonsAllowed);
 
