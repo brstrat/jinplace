@@ -59,7 +59,7 @@
 	 * @property {string} okButton - Create a submit button with this name
 	 * @property {string} cancelButton - Create a cancel button with this name
 	 * @property {string} inputClass - A css class that is added to the input field
-	 * @property {string} inputType - An input type for the input field
+	 * @property {object} inputAttrs - Map of attributes to set into the input (e.g. {type: "number"})
 	 * @property {boolean} inputPlaceholder - Show initial value as placeholder on input
 	 * @property {string} okButtonClass - A css class that is added to the ok button
 	 * @property {string} cancelButtonClass - A css class that is added to the cancel button
@@ -68,6 +68,7 @@
 	 * @property {string} placeholder - Text to display in empty elements.
 	 * @property {string} placeholderClass - Class to apply to element if placeholder is used.
 	 * @property {submitFunction} submitFunction - Function that is called to submit the new value.
+	 * @property {cancelFunction} cancelFunction - Function that is called when input is canceled.
 	 * @property {loadFunction} loadFunction - Function that is called to load the editing data
 	 */
 
@@ -82,13 +83,14 @@
 		'okButton',
 		'cancelButton',
 		'inputClass',
-		'inputType',
+		'inputAttrs',
 		'inputPlaceholder',
 		'activator',
 		'textOnly',
 		'placeholder',
 		'placeholderClass',
 		'submitFunction',
+		'cancelFunction',
 		'okButtonClass',
 		'cancelButtonClass'
 	];
@@ -215,8 +217,14 @@
 				if (!editor.inputField)
 					editor.inputField = field;
 				field.addClass(opts.inputClass);
-				if (opts.inputType)
-					field.attr('type', opts.inputType);
+
+				if (opts.inputAttrs != null) {
+				    for (var attrkey in opts.inputAttrs) {
+					    if (!hasProp.call(opts.inputAttrs, attrkey)) continue;
+					    field.attr(attrkey, opts.inputAttrs[attrkey]);
+				    }
+				}
+
 				if (opts.inputPlaceholder)
 					field.attr('placeholder', data);
 
@@ -233,12 +241,12 @@
 							return false;
 						})
 						.on("jip:cancel", function(ev) {
-							self.cancel(editor);
+							self.cancel(editor, opts);
 							return false;
 						})
 						.on("keyup", function(ev) {
 							if (ev.keyCode == 27) {
-								self.cancel(editor);
+								self.cancel(editor, opts);
 							}
 						});
 
@@ -298,7 +306,11 @@
 		 * @param {editorBase} editor The element editor.
 		 * @return {void}
 		 */
-		cancel: function(editor) {
+		cancel: function(editor, opts) {
+			try {
+				opts.cancelFunction.call(undefined);
+			} catch (e) {}
+
 			var self = this;
 			self.element.html(self.origValue);
 
@@ -343,7 +355,7 @@
 					.fail(function(jqxhr, textStatus, errorThrown) {
 						// If you have your own submitFunction, the arguments may have different meanings.
 						self.element.trigger('jinplace:fail', [jqxhr, textStatus, errorThrown]);
-						self.cancel(editor);
+						self.cancel(editor, opts);
 					})
 					.always(function(a, textStatus, c) {
 						// The meaning of the arguments depends on whether this is success or failure.
@@ -742,4 +754,3 @@
 		}
 	};
 })(jQuery, window, document);
-
